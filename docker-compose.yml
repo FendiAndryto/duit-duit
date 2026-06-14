@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   turnitin-slayer:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     image: turnitin-slayer:latest
