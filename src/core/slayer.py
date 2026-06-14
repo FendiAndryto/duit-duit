@@ -40,16 +40,34 @@ def process_turnitin_pdf(file_bytes: bytes, api_key: str) -> str:
     Raises:
         Exception: Jika terjadi kesalahan saat pemanggilan API atau kuota habis.
     """
+    import tempfile
+    import os
+    
+    tmp_path = ""
+    uploaded_file = None
+    client = None
+    
     try:
         # Inisialisasi client resmi terbaru
         client = genai.Client(api_key=api_key)
         model_name = "gemini-2.5-flash"
         
-        # Siapkan multimodal payload
-        pdf_part = types.Part.from_bytes(
-            data=file_bytes,
-            mime_type='application/pdf'
-        )
+        # Simpan file secara lokal sementara untuk diupload via File API
+        # File API (client.files.upload) mendukung dokumen besar hingga 2GB,
+        # mencegah error 400 INVALID_ARGUMENT akibat Payload Base64 inline yang terlalu besar (>4MB).
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+            tmp_file.write(file_bytes)
+            tmp_path = tmp_file.name
+            
+        uploaded_file = client.files.upload(file=tmp_path, config={'mime_type': 'application/pdf'})
+        
+        # Tunggu hingga status file ACTIVE (selesai diproses oleh Google)
+        while uploaded_file.state.name == "PROCESSING":
+            time.sleep(2)
+            uploaded_file = client.files.get(name=uploaded_file.name)
+            
+        if uploaded_file.state.name == "FAILED":
+            raise ValueError("Gagal memproses file PDF di server Google API.")
         
         prompt = (
             "Berikut adalah dokumen PDF Turnitin. Silakan analisis warna highlight-nya "
@@ -68,7 +86,7 @@ def process_turnitin_pdf(file_bytes: bytes, api_key: str) -> str:
             try:
                 response = client.models.generate_content(
                     model=model_name,
-                    contents=[pdf_part, prompt],
+                    contents=[uploaded_file, prompt],
                     config=config
                 )
                 
@@ -93,3 +111,17 @@ def process_turnitin_pdf(file_bytes: bytes, api_key: str) -> str:
     except Exception as e:
         logger.error(f"Unexpected error in process_turnitin_pdf: {e}")
         raise
+    finally:
+        # Selalu bersihkan file dari storage Google API setelah selesai (Storage Limit: 20GB gratis)
+        if client and uploaded_file:
+            try:
+                client.files.delete(name=uploaded_file.name)
+            except Exception as cleanup_e:
+                logger.error(f"Gagal membersihkan file dari Google API: {cleanup_e}")
+                
+        # Hapus temporary file dari server lokal
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
