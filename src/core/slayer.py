@@ -68,6 +68,16 @@ def process_turnitin_pdf(file_bytes: bytes, api_key: str) -> str:
             
         if uploaded_file.state.name == "FAILED":
             raise ValueError("Gagal memproses file PDF di server Google API.")
+            
+        # Beri jeda tambahan 4 detik agar file benar-benar siap dan tersinkronisasi di backend Google
+        # sebelum dikirim ke inference model untuk menghindari error 400 INVALID_ARGUMENT
+        time.sleep(4)
+        
+        # Gunakan types.Part.from_uri secara eksplisit agar payload JSON API valid
+        file_part = types.Part.from_uri(
+            file_uri=uploaded_file.uri,
+            mime_type='application/pdf'
+        )
         
         prompt = (
             "Berikut adalah dokumen PDF Turnitin. Silakan analisis warna highlight-nya "
@@ -86,7 +96,7 @@ def process_turnitin_pdf(file_bytes: bytes, api_key: str) -> str:
             try:
                 response = client.models.generate_content(
                     model=model_name,
-                    contents=[uploaded_file, prompt],
+                    contents=[file_part, prompt],
                     config=config
                 )
                 
