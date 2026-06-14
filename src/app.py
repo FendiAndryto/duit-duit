@@ -39,6 +39,22 @@ def main():
     # --- Sidebar Configuration ---
     with st.sidebar:
         st.header("⚙️ Konfigurasi")
+        
+        st.subheader("🤖 Model Selector")
+        model_options = {
+            "Gemini 1.5 Flash (Hemat)": "gemini-1.5-flash",
+            "Gemini 2.5 Flash (Cepat)": "gemini-2.5-flash",
+            "Gemini 1.5 Pro (Paling Pintar)": "gemini-1.5-pro"
+        }
+        selected_model_display = st.selectbox(
+            "Pilih Senjata AI", 
+            options=list(model_options.keys()),
+            index=1 # Default ke Gemini 2.5 Flash
+        )
+        selected_model = model_options[selected_model_display]
+        
+        st.divider()
+        
         st.markdown("Masukkan API Key jika tidak menggunakan default `.env` server.")
         override_api_key = st.text_input(
             "API Key (Opsional)", 
@@ -75,7 +91,7 @@ def main():
                 
                 # Gunakan st.spinner untuk operasi asynchronous/blocking yang lama
                 with st.spinner("Sistem sedang menganalisis warna... (Ini mungkin memakan waktu puluhan detik)"):
-                    result_text = process_turnitin_pdf(file_bytes=file_bytes, api_key=api_key)
+                    result_text = process_turnitin_pdf(file_bytes=file_bytes, api_key=api_key, model_name=selected_model)
                     final_result, red_badge_words, total_processed_words = add_similarity_badges(result_text)
                     
                     # Tampilkan DEBUG info sementara

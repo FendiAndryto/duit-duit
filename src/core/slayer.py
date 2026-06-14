@@ -26,13 +26,14 @@ Aturan Emas (Golden Rules) yang WAJIB kamu ikuti secara absolut:
 6. KETEGASAN: Jangan tambahkan basa-basi, salam, atau komentar apapun di luar format di atas. Pastikan hasil parafrase di-bold menggunakan double asterisk.
 """
 
-def process_turnitin_pdf(file_bytes: bytes, api_key: str) -> str:
+def process_turnitin_pdf(file_bytes: bytes, api_key: str, model_name: str = "gemini-2.5-flash") -> str:
     """
     Memproses file PDF Turnitin utuh menggunakan Gemini Multimodal.
     
     Args:
         file_bytes (bytes): Konten file PDF dalam bentuk biner.
         api_key (str): API Key untuk Google GenAI SDK.
+        model_name (str): Nama model Gemini yang digunakan (default: gemini-2.5-flash).
         
     Returns:
         str: Hasil teks yang sudah direkonstruksi (parafrase pada bagian highlight saja).
@@ -52,7 +53,6 @@ def process_turnitin_pdf(file_bytes: bytes, api_key: str) -> str:
     try:
         # Inisialisasi client resmi terbaru
         client = genai.Client(api_key=api_key)
-        model_name = "gemini-2.5-flash"
         
         # Siasat Jitu: File PDF dari Turnitin seringkali memiliki meta-struktur rumit, 
         # DRM, atau objek XFA/watermark yang ditolak mentah-mentah oleh Google API 
