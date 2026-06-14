@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  turnitin-slayer:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: turnitin-slayer:latest
+    container_name: turnitin-slayer-app
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    restart: unless-stopped
+    # Hapus komentar di bawah ini HANYA JIKA sedang development (hot reload)
+    # volumes:
+    #   - ./src:/app/src
