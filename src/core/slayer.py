@@ -42,6 +42,8 @@ def process_turnitin_pdf(file_bytes: bytes, api_key: str) -> str:
     """
     import tempfile
     import os
+    import io
+    from PyPDF2 import PdfReader, PdfWriter
     
     tmp_path = ""
     uploaded_file = None
@@ -52,12 +54,27 @@ def process_turnitin_pdf(file_bytes: bytes, api_key: str) -> str:
         client = genai.Client(api_key=api_key)
         model_name = "gemini-2.5-flash"
         
-        # Simpan file secara lokal sementara untuk diupload via File API
-        # File API (client.files.upload) mendukung dokumen besar hingga 2GB,
-        # mencegah error 400 INVALID_ARGUMENT akibat Payload Base64 inline yang terlalu besar (>4MB).
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-            tmp_file.write(file_bytes)
-            tmp_path = tmp_file.name
+        # Siasat Jitu: File PDF dari Turnitin seringkali memiliki meta-struktur rumit, 
+        # DRM, atau objek XFA/watermark yang ditolak mentah-mentah oleh Google API 
+        # (sehingga muncul pesan 'Request contains an invalid argument').
+        # Solusi: Kita cuci (sanitize) PDF-nya dengan PyPDF2 dengan cara merekonstruksi
+        # halamannya dari awal sebelum dikirim ke Google.
+        try:
+            reader = PdfReader(io.BytesIO(file_bytes))
+            writer = PdfWriter()
+            
+            # Pindahkan seluruh halaman ke writer baru untuk membuang anomali struktur
+            for page in reader.pages:
+                writer.add_page(page)
+                
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                writer.write(tmp_file)
+                tmp_path = tmp_file.name
+        except Exception as e:
+            logger.warning(f"PyPDF2 gagal membersihkan PDF, mencoba mode mentah (raw): {e}")
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                tmp_file.write(file_bytes)
+                tmp_path = tmp_file.name
             
         uploaded_file = client.files.upload(file=tmp_path, config={'mime_type': 'application/pdf'})
         
