@@ -82,8 +82,8 @@ def process_turnitin_pdf(file_bytes: bytes, model_name: str = "gemini-2.5-flash"
                 tmp_path = tmp_file.name
         
         prompt = (
-            "Berikut adalah dokumen PDF Turnitin. Silakan analisis warna highlight-nya "
-            "dan hasilkan teks dokumen penuh sesuai dengan aturan sistem yang telah diberikan."
+            "Berikut adalah dokumen PDF Turnitin. Silakan analisis HANYA pada bagian teks yang memiliki warna highlight/sorotan plagiasi. "
+            "Abaikan teks yang bersih (tanpa warna). Hasilkan output berupa daftar teks asli dan hasil parafrasenya sesuai aturan format Markdown yang telah ditetapkan."
         )
         
         config = types.GenerateContentConfig(
