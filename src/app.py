@@ -175,7 +175,7 @@ Belum punya akun atau kuota habis? Pilih paket di bawah ini:
 
 **Langsung chat admin untuk aktivasi instan:**
             """)
-            st.link_button("💬 Chat Admin 1 (0881010290184)", "https://wa.me/62881010290184?text=Halo%20Admin%201,%20saya%20mau%20beli/perpanjang%20paket%20Turnitin%20Slayer")
+            st.link_button("💬 Chat Admin 1 (0881010290185)", "https://wa.me/62881010290185?text=Halo%20Admin%201,%20saya%20mau%20beli/perpanjang%20paket%20Turnitin%20Slayer")
             st.link_button("💬 Chat Admin 2 (085881705459)", "https://wa.me/6285881705459?text=Halo%20Admin%202,%20saya%20mau%20beli/perpanjang%20paket%20Turnitin%20Slayer")
             
         return
