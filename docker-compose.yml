@@ -10,7 +10,10 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data:/app/data
+      - slayer_data:/app/data
     restart: unless-stopped
+
+volumes:
+  slayer_data:
     # Hapus komentar di bawah ini HANYA JIKA sedang development (hot reload)
     #   - ./src:/app/src
