@@ -150,6 +150,7 @@ Ini akun login Turnitin Slayer lu, Bos. Gunakan dengan bijak buat ngebantai revi
 def user_app():
     if not st.session_state.logged_in_user:
         st.title("🛡️ Turnitin Slayer")
+        st.info("⚠️ **PEMBERITAHUAN:** File yang di-upload harus berupa hasil PDF dari Turnitin. Jika dokumen belum pernah dicek Turnitin, silakan hubungi admin untuk cek Turnitin terlebih dahulu sebelum membeli paket.")
         
         col1, col2 = st.columns([1, 1])
         
@@ -224,6 +225,8 @@ Belum punya akun atau kuota habis? Pilih paket di bawah ini:
     user = st.session_state.logged_in_user
     
     st.title("🛡️ Turnitin Slayer")
+    st.info("⚠️ **PEMBERITAHUAN:** File yang di-upload harus berupa hasil PDF dari Turnitin. Jika dokumen belum pernah dicek Turnitin, silakan hubungi admin untuk cek Turnitin terlebih dahulu.")
+    
     st.markdown(
         "Aplikasi otomasi parafrase dokumen akademik dari PDF Turnitin. "
         "Sistem ini hanya akan mengubah bagian yang ter-*highlight* warna tanpa mengubah format, "
