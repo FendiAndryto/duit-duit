@@ -91,7 +91,7 @@ Ini akun login Turnitin Slayer lu, Bos. Gunakan dengan bijak buat ngebantai revi
 📊 *Sisa Kuota:* {quota}x Submit PDF
 ⏳ *Masa Aktif:* {exp_str}
 
-🔗 *Link Aplikasi:* [URL Aplikasi Lu]"""
+🔗 *Link Aplikasi:* https://turnitin-slayer.homever.my.id"""
                 st.text_area("Copy Text WhatsApp:", value=wa_text, height=200)
             else:
                 st.error("❌ Gagal membuat akun. Silakan coba lagi.")
