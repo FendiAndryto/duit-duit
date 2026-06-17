@@ -12,7 +12,7 @@ from src.core.slayer import process_turnitin_pdf
 from src.utils.doc_handler import export_to_docx
 from src.utils.similarity import add_similarity_badges
 from src.core.database import (verify_user, create_user, deduct_quota, 
-                               add_api_key, get_all_keys, get_all_users, update_user)
+                               add_api_key, get_all_keys, get_all_users, update_user, delete_user)
 from datetime import datetime, timedelta
 
 # Setup dasar Streamlit
@@ -123,11 +123,22 @@ Ini akun login Turnitin Slayer lu, Bos. Gunakan dengan bijak buat ngebantai revi
             new_quota = st.number_input("Update Kuota Akhir", value=auto_new_quota, min_value=0)
             new_exp = st.date_input("Update Masa Aktif Akhir", value=auto_new_exp)
             
-            if st.button("Update User"):
-                if update_user(sel_u['id'], new_quota, new_exp.strftime('%Y-%m-%d')):
-                    st.success(f"✅ Akun {sel_u['username']} berhasil diupdate!")
-                else:
-                    st.error("❌ Gagal update akun.")
+            col_update, col_delete = st.columns(2)
+            with col_update:
+                if st.button("Update User", use_container_width=True):
+                    if update_user(sel_u['id'], new_quota, new_exp.strftime('%Y-%m-%d')):
+                        st.success(f"✅ Akun {sel_u['username']} berhasil diupdate!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Gagal update akun.")
+            
+            with col_delete:
+                if st.button("🗑️ Hapus Akun", type="primary", use_container_width=True):
+                    if delete_user(sel_u['id']):
+                        st.success(f"✅ Akun {sel_u['username']} berhasil dihapus!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Gagal menghapus akun.")
         else:
             st.info("Belum ada user terdaftar.")
 
