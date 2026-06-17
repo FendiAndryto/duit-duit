@@ -194,10 +194,11 @@ Belum punya akun atau kuota habis? Pilih paket di bawah ini:
         st.markdown("Berikut adalah tampilan antarmuka dan hasil parafrase dari Turnitin Slayer:")
         
         # Display images if they exist in the assets folder
-        col_img1, col_img2 = st.columns(2)
+        col_img1, col_img2, col_img3 = st.columns(3)
         
         img1_path = os.path.join("assets", "contoh1.jpeg")
         img2_path = os.path.join("assets", "contoh2.jpeg")
+        img3_path = os.path.join("assets", "contoh3.jpeg")
         
         with col_img1:
             if os.path.exists(img1_path):
@@ -210,6 +211,12 @@ Belum punya akun atau kuota habis? Pilih paket di bawah ini:
                 st.image(img2_path, caption="Hasil Analisis & Parafrase", use_container_width=True)
             else:
                 st.info("Posisikan gambar kedua di folder 'assets/contoh2.jpeg'")
+
+        with col_img3:
+            if os.path.exists(img3_path):
+                st.image(img3_path, caption="Download & Export Format Document", use_container_width=True)
+            else:
+                st.info("Posisikan gambar ketiga di folder 'assets/contoh3.jpeg'")
                 
         return
 
