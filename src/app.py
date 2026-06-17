@@ -150,7 +150,6 @@ Ini akun login Turnitin Slayer lu, Bos. Gunakan dengan bijak buat ngebantai revi
 def user_app():
     if not st.session_state.logged_in_user:
         st.title("🛡️ Turnitin Slayer")
-        st.info("⚠️ **PEMBERITAHUAN:** File yang di-upload harus berupa hasil PDF dari Turnitin. Jika dokumen belum pernah dicek Turnitin, silakan hubungi admin untuk cek Turnitin terlebih dahulu sebelum membeli paket.")
         
         col1, col2 = st.columns([1, 1])
         
@@ -233,7 +232,6 @@ Belum punya akun atau kuota habis? Pilih paket di bawah ini:
     user = st.session_state.logged_in_user
     
     st.title("🛡️ Turnitin Slayer")
-    st.info("⚠️ **PEMBERITAHUAN:** File yang di-upload harus berupa hasil PDF dari Turnitin. Jika dokumen belum pernah dicek Turnitin, silakan hubungi admin untuk cek Turnitin terlebih dahulu.")
     
     st.markdown(
         "Aplikasi otomasi parafrase dokumen akademik dari PDF Turnitin. "
@@ -367,7 +365,20 @@ Belum punya akun atau kuota habis? Pilih paket di bawah ini:
             except Exception as e:
                 st.error(f"Gagal menyiapkan file .docx: {e}")
 
+@st.dialog("⚠️ PEMBERITAHUAN PENTING")
+def popup_notification():
+    st.warning("File yang di-upload harus berupa **hasil PDF dari Turnitin**.")
+    st.info("Jika dokumen belum pernah dicek Turnitin, silakan **hubungi admin** untuk cek Turnitin terlebih dahulu sebelum memproses dokumen di sini.")
+    if st.button("Saya Mengerti", use_container_width=True):
+        st.session_state.popup_shown = True
+        st.rerun()
+
 def main():
+    # Munculkan popup jika belum pernah muncul di session ini
+    # Session state akan reset setiap kali user nge-refresh browser
+    if "popup_shown" not in st.session_state:
+        popup_notification()
+
     query_params = st.query_params
     if query_params.get("mode") == "bosgila":
         admin_dashboard()
