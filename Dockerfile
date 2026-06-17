@@ -34,8 +34,8 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy kode aplikasi
 COPY . .
 
-# Set kepemilikan file ke non-root user
-RUN chown -R appuser:appuser /app
+# Buat folder data secara eksplisit untuk volume map dan set kepemilikan ke non-root user
+RUN mkdir -p /app/data && chown -R appuser:appuser /app
 
 # Ganti pengguna ke non-root
 USER appuser
