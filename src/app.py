@@ -186,9 +186,31 @@ Belum punya akun atau kuota habis? Pilih paket di bawah ini:
 
 **Langsung chat admin untuk aktivasi instan:**
             """)
-            st.link_button("💬 Chat Admin 1 (0881010290185)", "https://wa.me/62881010290185?text=Halo%20Admin%201,%20saya%20mau%20beli/perpanjang%20paket%20Turnitin%20Slayer")
-            st.link_button("💬 Chat Admin 2 (085881705459)", "https://wa.me/6285881705459?text=Halo%20Admin%202,%20saya%20mau%20beli/perpanjang%20paket%20Turnitin%20Slayer")
+            st.link_button("💬 Chat Admin 1", "https://wa.me/62881010290185?text=Halo%20Admin%201,%20saya%20mau%20beli/perpanjang%20paket%20Turnitin%20Slayer")
+            st.link_button("💬 Chat Admin 2", "https://wa.me/6285881705459?text=Halo%20Admin%202,%20saya%20mau%20beli/perpanjang%20paket%20Turnitin%20Slayer")
             
+        st.divider()
+        st.subheader("💡 Contoh Penggunaan Aplikasi")
+        st.markdown("Berikut adalah tampilan antarmuka dan hasil parafrase dari Turnitin Slayer:")
+        
+        # Display images if they exist in the assets folder
+        col_img1, col_img2 = st.columns(2)
+        
+        img1_path = os.path.join("assets", "contoh1.png")
+        img2_path = os.path.join("assets", "contoh2.png")
+        
+        with col_img1:
+            if os.path.exists(img1_path):
+                st.image(img1_path, caption="Tampilan Utama Turnitin Slayer", use_container_width=True)
+            else:
+                st.info("Posisikan gambar pertama di folder 'assets/contoh1.png'")
+                
+        with col_img2:
+            if os.path.exists(img2_path):
+                st.image(img2_path, caption="Hasil Analisis & Parafrase", use_container_width=True)
+            else:
+                st.info("Posisikan gambar kedua di folder 'assets/contoh2.png'")
+                
         return
 
     # User is logged in
