@@ -138,27 +138,46 @@ Ini akun login Turnitin Slayer lu, Bos. Gunakan dengan bijak buat ngebantai revi
 
 def user_app():
     if not st.session_state.logged_in_user:
-        st.title("🛡️ Login Turnitin Slayer")
-        st.markdown("Silakan login dengan akun yang diberikan admin.")
+        st.title("🛡️ Turnitin Slayer")
         
-        with st.form("login_form"):
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
-            submitted = st.form_submit_button("Login")
-            
-            if submitted:
-                user_data = verify_user(username, password)
-                if user_data:
-                    # Cek expired date
-                    today_str = datetime.now().strftime('%Y-%m-%d')
-                    exp_date = user_data.get('expired_date')
-                    if exp_date and today_str > exp_date:
-                        st.error("⚠️ Masa aktif akun lu udah abis, Bos! Silakan hubungi admin di WA buat isi ulang/perpanjang.")
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            st.subheader("🔑 Login Akses")
+            st.markdown("Silakan login dengan akun yang diberikan admin.")
+            with st.form("login_form"):
+                username = st.text_input("Username")
+                password = st.text_input("Password", type="password")
+                submitted = st.form_submit_button("Login")
+                
+                if submitted:
+                    user_data = verify_user(username, password)
+                    if user_data:
+                        # Cek expired date
+                        today_str = datetime.now().strftime('%Y-%m-%d')
+                        exp_date = user_data.get('expired_date')
+                        if exp_date and today_str > exp_date:
+                            st.error("⚠️ Masa aktif akun lu udah abis, Bos! Silakan hubungi admin di WA buat isi ulang/perpanjang.")
+                        else:
+                            st.session_state.logged_in_user = user_data
+                            st.rerun()
                     else:
-                        st.session_state.logged_in_user = user_data
-                        st.rerun()
-                else:
-                    st.error("❌ Username atau password salah!")
+                        st.error("❌ Username atau password salah!")
+
+        with col2:
+            st.subheader("🛒 Beli / Perpanjang Paket")
+            st.markdown("""
+Belum punya akun atau kuota habis? Pilih paket di bawah ini:
+
+- 🥉 **Paket 1:** 1x Submit (Aktif 2 Hari)
+- 🥈 **Paket 2:** 3x Submit (Aktif 7 Hari)
+- 🥇 **Paket 3:** 7x Submit (Aktif 14 Hari)
+
+**Langsung chat admin untuk aktivasi instan:**
+            """)
+            st.link_button("💬 Chat Admin 1 (0881010290184)", "https://wa.me/62881010290184?text=Halo%20Admin%201,%20saya%20mau%20beli/perpanjang%20paket%20Turnitin%20Slayer")
+            st.link_button("💬 Chat Admin 2 (085881705459)", "https://wa.me/6285881705459?text=Halo%20Admin%202,%20saya%20mau%20beli/perpanjang%20paket%20Turnitin%20Slayer")
+            
         return
 
     # User is logged in
@@ -183,19 +202,6 @@ def user_app():
             
         st.divider()
         st.header("⚙️ Konfigurasi")
-        
-        st.subheader("🤖 Model Selector")
-        model_options = {
-            "Gemini 1.5 Flash (Hemat)": "gemini-1.5-flash",
-            "Gemini 2.5 Flash (Cepat)": "gemini-2.5-flash",
-            "Gemini 1.5 Pro (Paling Pintar)": "gemini-1.5-pro"
-        }
-        selected_model_display = st.selectbox(
-            "Pilih Senjata AI", 
-            options=list(model_options.keys()),
-            index=1 # Default ke Gemini 2.5 Flash
-        )
-        selected_model = model_options[selected_model_display]
         
         st.divider()
         st.subheader("📉 Plagiarism Predictor")
@@ -226,7 +232,7 @@ def user_app():
                     file_bytes = uploaded_file.getvalue()
                     
                     with st.spinner("Sistem sedang menganalisis warna... (Ini mungkin memakan waktu puluhan detik)"):
-                        result_text = process_turnitin_pdf(file_bytes=file_bytes, model_name=selected_model)
+                        result_text = process_turnitin_pdf(file_bytes=file_bytes, model_name="gemini-2.5-flash")
                         final_result, red_badge_words, total_processed_words = add_similarity_badges(result_text)
                         
                         st.warning(f"🛠️ DEBUG INFO: Total Kata Diproses = {total_processed_words} | Kata Gagal (Merah) = {red_badge_words}")
