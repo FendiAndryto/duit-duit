@@ -12,7 +12,8 @@ from src.core.slayer import process_turnitin_pdf
 from src.utils.doc_handler import export_to_docx
 from src.utils.similarity import add_similarity_badges
 from src.core.database import (verify_user, create_user, deduct_quota, 
-                               add_api_key, get_all_keys, get_all_users)
+                               add_api_key, get_all_keys, get_all_users, update_user)
+from datetime import datetime, timedelta
 
 # Setup dasar Streamlit
 st.set_page_config(
@@ -68,13 +69,15 @@ def admin_dashboard():
             "Paket 3: 7x Submit": 7
         }
         selected_paket = st.selectbox("Pilih Paket Kuota", options=list(paket_options.keys()))
+        expired_date_input = st.date_input("Masa Aktif Sampai", value=datetime.now() + timedelta(days=30))
         
         if st.button("Generate Akun", type="primary"):
             quota = paket_options[selected_paket]
             username = f"slayer_{random.randint(1000, 9999)}"
             password = generate_random_string(8)
+            exp_str = expired_date_input.strftime('%Y-%m-%d')
             
-            success = create_user(username, password, quota)
+            success = create_user(username, password, quota, exp_str)
             if success:
                 st.success("✅ Akun berhasil dibuat!")
                 wa_text = f"""💸 *PEMBAYARAN VERIFIED!*
@@ -83,16 +86,43 @@ Ini akun login Turnitin Slayer lu, Bos. Gunakan dengan bijak buat ngebantai revi
 👤 *Username:* {username}
 🔑 *Password:* {password}
 📊 *Sisa Kuota:* {quota}x Submit PDF
+⏳ *Masa Aktif:* {exp_str}
 
 🔗 *Link Aplikasi:* [URL Aplikasi Lu]"""
                 st.text_area("Copy Text WhatsApp:", value=wa_text, height=200)
             else:
                 st.error("❌ Gagal membuat akun. Silakan coba lagi.")
                 
-        st.subheader("Daftar Akun User")
+        st.divider()
+        st.subheader("🛠️ Update Kuota & Expired User")
         users = get_all_users()
+        if users:
+            user_options = {u['username']: u for u in users}
+            selected_user_to_update = st.selectbox("Pilih Username", options=list(user_options.keys()))
+            sel_u = user_options[selected_user_to_update]
+            
+            new_quota = st.number_input("Update Kuota", value=sel_u['quota'], min_value=0)
+            
+            # Parsing current expired date or use default
+            try:
+                curr_exp = datetime.strptime(sel_u['expired_date'], '%Y-%m-%d').date() if sel_u['expired_date'] else datetime.now().date() + timedelta(days=30)
+            except:
+                curr_exp = datetime.now().date() + timedelta(days=30)
+                
+            new_exp = st.date_input("Update Masa Aktif", value=curr_exp)
+            
+            if st.button("Update User"):
+                if update_user(sel_u['id'], new_quota, new_exp.strftime('%Y-%m-%d')):
+                    st.success(f"✅ Akun {sel_u['username']} berhasil diupdate!")
+                else:
+                    st.error("❌ Gagal update akun.")
+        else:
+            st.info("Belum ada user terdaftar.")
+
+        st.divider()
+        st.subheader("Daftar Akun User")
         for u in users:
-            st.write(f"ID: {u['id']} | User: {u['username']} | Kuota: {u['quota']}")
+            st.write(f"ID: {u['id']} | User: {u['username']} | Kuota: {u['quota']} | Expired: {u['expired_date']}")
 
 def user_app():
     if not st.session_state.logged_in_user:
@@ -107,8 +137,14 @@ def user_app():
             if submitted:
                 user_data = verify_user(username, password)
                 if user_data:
-                    st.session_state.logged_in_user = user_data
-                    st.rerun()
+                    # Cek expired date
+                    today_str = datetime.now().strftime('%Y-%m-%d')
+                    exp_date = user_data.get('expired_date')
+                    if exp_date and today_str > exp_date:
+                        st.error("⚠️ Masa aktif akun lu udah abis, Bos! Silakan hubungi admin di WA buat isi ulang/perpanjang.")
+                    else:
+                        st.session_state.logged_in_user = user_data
+                        st.rerun()
                 else:
                     st.error("❌ Username atau password salah!")
         return

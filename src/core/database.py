@@ -119,6 +119,20 @@ def get_all_users() -> list:
     conn.close()
     return users
 
+def update_user(user_id: int, new_quota: int, new_expired_date: str) -> bool:
+    """Updates a user's quota and expired_date."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE users 
+        SET quota = ?, expired_date = ? 
+        WHERE id = ?
+    ''', (new_quota, new_expired_date, user_id))
+    success = cursor.rowcount > 0
+    conn.commit()
+    conn.close()
+    return success
+
 # --- API Key Management (Smart Rotator) ---
 
 def get_available_key() -> dict:
