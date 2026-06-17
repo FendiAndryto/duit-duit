@@ -169,9 +169,9 @@ def user_app():
             st.markdown("""
 Belum punya akun atau kuota habis? Pilih paket di bawah ini:
 
-- 🥉 **Paket 1:** 1x Submit (Aktif 2 Hari)
-- 🥈 **Paket 2:** 3x Submit (Aktif 7 Hari)
-- 🥇 **Paket 3:** 7x Submit (Aktif 14 Hari)
+- 🥉 **Paket 1:** 1x Submit (Aktif 2 Hari) — **Rp 5.000**
+- 🥈 **Paket 2:** 3x Submit (Aktif 7 Hari) — **Rp 12.000**
+- 🥇 **Paket 3:** 7x Submit (Aktif 14 Hari) — **Rp 25.000**
 
 **Langsung chat admin untuk aktivasi instan:**
             """)
