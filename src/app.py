@@ -196,20 +196,20 @@ Belum punya akun atau kuota habis? Pilih paket di bawah ini:
         # Display images if they exist in the assets folder
         col_img1, col_img2 = st.columns(2)
         
-        img1_path = os.path.join("assets", "contoh1.png")
-        img2_path = os.path.join("assets", "contoh2.png")
+        img1_path = os.path.join("assets", "contoh1.jpeg")
+        img2_path = os.path.join("assets", "contoh2.jpeg")
         
         with col_img1:
             if os.path.exists(img1_path):
                 st.image(img1_path, caption="Tampilan Utama Turnitin Slayer", use_container_width=True)
             else:
-                st.info("Posisikan gambar pertama di folder 'assets/contoh1.png'")
+                st.info("Posisikan gambar pertama di folder 'assets/contoh1.jpeg'")
                 
         with col_img2:
             if os.path.exists(img2_path):
                 st.image(img2_path, caption="Hasil Analisis & Parafrase", use_container_width=True)
             else:
-                st.info("Posisikan gambar kedua di folder 'assets/contoh2.png'")
+                st.info("Posisikan gambar kedua di folder 'assets/contoh2.jpeg'")
                 
         return
 
