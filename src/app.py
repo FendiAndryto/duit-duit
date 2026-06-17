@@ -64,15 +64,18 @@ def admin_dashboard():
     with col2:
         st.header("👤 Cetak Akun User")
         paket_options = {
-            "Paket 1: 1x Submit": 1,
-            "Paket 2: 3x Submit": 3,
-            "Paket 3: 7x Submit": 7
+            "Paket 1: 1x Submit (2 Hari)": {"quota": 1, "days": 2},
+            "Paket 2: 3x Submit (7 Hari)": {"quota": 3, "days": 7},
+            "Paket 3: 7x Submit (14 Hari)": {"quota": 7, "days": 14}
         }
         selected_paket = st.selectbox("Pilih Paket Kuota", options=list(paket_options.keys()))
-        expired_date_input = st.date_input("Masa Aktif Sampai", value=datetime.now() + timedelta(days=30))
+        paket_data = paket_options[selected_paket]
+        
+        auto_exp_date = datetime.now() + timedelta(days=paket_data["days"])
+        expired_date_input = st.date_input("Masa Aktif Sampai", value=auto_exp_date)
         
         if st.button("Generate Akun", type="primary"):
-            quota = paket_options[selected_paket]
+            quota = paket_data["quota"]
             username = f"slayer_{random.randint(1000, 9999)}"
             password = generate_random_string(8)
             exp_str = expired_date_input.strftime('%Y-%m-%d')
@@ -101,15 +104,24 @@ Ini akun login Turnitin Slayer lu, Bos. Gunakan dengan bijak buat ngebantai revi
             selected_user_to_update = st.selectbox("Pilih Username", options=list(user_options.keys()))
             sel_u = user_options[selected_user_to_update]
             
-            new_quota = st.number_input("Update Kuota", value=sel_u['quota'], min_value=0)
+            st.write(f"**Sisa Kuota:** {sel_u['quota']} | **Masa Aktif Saat Ini:** {sel_u['expired_date']}")
             
-            # Parsing current expired date or use default
+            update_paket = st.selectbox("Pilih Paket Tambahan", options=list(paket_options.keys()), key="update_paket")
+            paket_data_update = paket_options[update_paket]
+            
+            auto_new_quota = sel_u['quota'] + paket_data_update['quota']
+            
+            # Parsing current expired date
             try:
-                curr_exp = datetime.strptime(sel_u['expired_date'], '%Y-%m-%d').date() if sel_u['expired_date'] else datetime.now().date() + timedelta(days=30)
+                curr_exp = datetime.strptime(sel_u['expired_date'], '%Y-%m-%d').date() if sel_u['expired_date'] else datetime.now().date()
             except:
-                curr_exp = datetime.now().date() + timedelta(days=30)
+                curr_exp = datetime.now().date()
                 
-            new_exp = st.date_input("Update Masa Aktif", value=curr_exp)
+            base_date = curr_exp if curr_exp >= datetime.now().date() else datetime.now().date()
+            auto_new_exp = base_date + timedelta(days=paket_data_update['days'])
+            
+            new_quota = st.number_input("Update Kuota Akhir", value=auto_new_quota, min_value=0)
+            new_exp = st.date_input("Update Masa Aktif Akhir", value=auto_new_exp)
             
             if st.button("Update User"):
                 if update_user(sel_u['id'], new_quota, new_exp.strftime('%Y-%m-%d')):
