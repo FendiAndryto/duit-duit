@@ -12,7 +12,7 @@ from src.core.slayer import process_turnitin_pdf
 from src.utils.doc_handler import export_to_docx
 from src.utils.similarity import add_similarity_badges
 from src.core.database import (verify_user, create_user, deduct_quota, 
-                               add_api_key, get_all_keys)
+                               add_api_key, get_all_keys, get_all_users)
 
 # Setup dasar Streamlit
 st.set_page_config(
@@ -88,6 +88,11 @@ Ini akun login Turnitin Slayer lu, Bos. Gunakan dengan bijak buat ngebantai revi
                 st.text_area("Copy Text WhatsApp:", value=wa_text, height=200)
             else:
                 st.error("❌ Gagal membuat akun. Silakan coba lagi.")
+                
+        st.subheader("Daftar Akun User")
+        users = get_all_users()
+        for u in users:
+            st.write(f"ID: {u['id']} | User: {u['username']} | Kuota: {u['quota']}")
 
 def user_app():
     if not st.session_state.logged_in_user:

@@ -110,6 +110,15 @@ def deduct_quota(user_id: int) -> bool:
     conn.close()
     return success
 
+def get_all_users() -> list:
+    """Returns all users for admin dashboard."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT id, username, quota, expired_date FROM users')
+    users = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return users
+
 # --- API Key Management (Smart Rotator) ---
 
 def get_available_key() -> dict:
