@@ -12,7 +12,8 @@ from src.core.slayer import process_turnitin_pdf
 from src.utils.doc_handler import export_to_docx
 from src.utils.similarity import add_similarity_badges
 from src.core.database import (verify_user, create_user, deduct_quota, 
-                               add_api_key, get_all_keys, get_all_users, update_user, delete_user)
+                               add_api_key, get_all_keys, get_all_users, update_user, delete_user,
+                               delete_api_key, delete_all_api_keys)
 from datetime import datetime, timedelta
 
 # Setup dasar Streamlit
@@ -38,7 +39,7 @@ def generate_random_string(length=8):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 def admin_dashboard():
-    st.title("🧙‍♂️ Ruang Kendali Bos Pendi")
+    st.title("🧙‍♂️ Ruang Kendali Bos")
     st.warning("Halaman Khusus Admin!")
     
     col1, col2 = st.columns(2)
@@ -57,9 +58,22 @@ def admin_dashboard():
                 st.warning("Masukkan key terlebih dahulu.")
                 
         st.subheader("Daftar Token")
+        
+        if st.button("🗑️ Hapus Semua Key", type="primary"):
+            if delete_all_api_keys():
+                st.success("✅ Semua API Key berhasil dihapus!")
+                st.rerun()
+                
         keys = get_all_keys()
         for k in keys:
-            st.write(f"ID: {k['id']} | Usage: {k['usage_today']}/20 | Active: {k['is_active']} | Last Used: {k['last_used']}")
+            col_k1, col_k2 = st.columns([4, 1])
+            with col_k1:
+                st.write(f"ID: {k['id']} | Usage: {k['usage_today']}/20 | Active: {k['is_active']}")
+            with col_k2:
+                if st.button("Hapus", key=f"del_key_{k['id']}"):
+                    if delete_api_key(k['id']):
+                        st.success(f"Key ID {k['id']} dihapus!")
+                        st.rerun()
             
     with col2:
         st.header("👤 Cetak Akun User")

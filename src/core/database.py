@@ -208,4 +208,24 @@ def get_all_keys() -> list:
     return keys
 
 # Initialize the DB whenever this module is loaded
+def delete_api_key(key_id: int) -> bool:
+    """Deletes an API key from the database."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM api_keys WHERE id = ?', (key_id,))
+    success = cursor.rowcount > 0
+    conn.commit()
+    conn.close()
+    return success
+
+def delete_all_api_keys() -> bool:
+    """Deletes all API keys from the database."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM api_keys')
+    success = True
+    conn.commit()
+    conn.close()
+    return success
+
 init_db()

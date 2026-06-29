@@ -146,9 +146,9 @@ def process_turnitin_pdf(file_bytes: bytes, model_name: str = "gemini-2.5-flash"
                     except Exception:
                         pass
                 
-                if ("429" in error_msg or "503" in error_msg or "RESOURCE_EXHAUSTED" in error_msg):
-                    logger.warning(f"Google API Error (429/503) pada Key ID {key_id}. Retrying... (Attempt {attempt + 1}/{max_retries})")
-                    # Tandai key ini exhausted (usage = 20)
+                if ("429" in error_msg or "503" in error_msg or "RESOURCE_EXHAUSTED" in error_msg or "403" in error_msg or "PERMISSION_DENIED" in error_msg):
+                    logger.warning(f"Google API Error (Limit/Banned) pada Key ID {key_id}: {error_msg}. Retrying... (Attempt {attempt + 1}/{max_retries})")
+                    # Tandai key ini exhausted (usage = 20) agar diganti dengan key lain
                     update_key_exhausted(key_id)
                     if attempt >= max_retries:
                         raise RuntimeError(f"Gagal setelah {max_retries} percobaan ganti token.")
